@@ -10,13 +10,19 @@ def add(numbers: str) -> int:
     :raises NegativeNumberException: raises an exception
     """
     numbers_sum = 0
+
     if not isinstance(numbers, str):
         return numbers_sum
+    elif not numbers.strip():
+        return numbers_sum
+
     return numbers_sum
 
 
 # test cases
 assert add("") == 0
+assert add(" ") == 0
+
 assert add(1) == 0
 assert add((1,)) == 0
-assert add([1,2]) == 0
+assert add([1, 2]) == 0
