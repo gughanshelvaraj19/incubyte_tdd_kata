@@ -56,10 +56,11 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
 
 
 @lru_cache(maxsize=3)
-def add(numbers: str, raise_exception=True) -> int:
+def add(numbers: str, raise_exception: bool = True) -> int:
     """
     String calculator to calculate the sum of all the integers in the string
     :param numbers: a string of delimiter-separated numbers
+    :param raise_exception: disable or enable raise exception, defaults to enable
     :return: an integer sum of all numbers in string
     :raises NegativeNumberException: raises an exception
     """
@@ -90,4 +91,4 @@ def add(numbers: str, raise_exception=True) -> int:
 
 
 if __name__ == "__main__":
-    print("Hey! Thanks for this oppurtunity, it was fun solving. :)")
+    print("Hey! Thanks for this opportunity, it was fun solving. :)")
