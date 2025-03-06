@@ -1,6 +1,6 @@
 import pytest
 
-from string_calculator import add
+from string_calculator import add, NegativeNumberException
 
 
 class TestAdd:
@@ -71,14 +71,35 @@ class TestAdd:
         """
         Tests multi-digit sequence with negatives
         """
-        assert add("1,1,1,000*0001}\n0001\n*1000+1+1-154-1\n") == 1007
-        assert add("\n1,1,1,000*0001}\n0001\n*1000+1+1-145-1\n") == 1007
-        assert add("1,1,1,000*0001}0001*1000+1+1,&&-456--") == 1007
-        assert add("1,2,3,10*10,\n-1-456&&-34567--") == 26
-        assert add("1,2,3,10*10-456-5") == 26
-        assert add("-1,-2,3,10*10-456-5") == 23
-        assert add("-1,-2,-3,10*10)456(5\n") == 481
-        assert add("-1,-2,-3,-10*-10)-456-(-5\n") == 0
+        assert (
+            add("1,1,1,000*0001}\n0001\n*1000+1+1-154-1\n", raise_exception=False)
+            == 1007
+        )
+        assert (
+            add("\n1,1,1,000*0001}\n0001\n*1000+1+1-145-1\n", raise_exception=False)
+            == 1007
+        )
+        assert (
+            add("1,1,1,000*0001}0001*1000+1+1,&&-456--", raise_exception=False) == 1007
+        )
+        assert add("1,2,3,10*10,\n-1-456&&-34567--", raise_exception=False) == 26
+        assert add("1,2,3,10*10-456-5", raise_exception=False) == 26
+        assert add("-1,-2,3,10*10-456-5", raise_exception=False) == 23
+        assert add("-1,-2,-3,10*10)456(5\n", raise_exception=False) == 481
+        assert add("-1,-2,-3,-10*-10)-456-(-5\n", raise_exception=False) == 0
+
+    def test_seq_with_negatives_raises_exception(self):
+        """
+        Tests multi-digit sequence with negatives
+        """
+        with pytest.raises(NegativeNumberException):
+            add("1,1,1,000*0001}\n0001\n*1000+1+1-154-1\n")
+
+        with pytest.raises(
+            NegativeNumberException,
+            match="Negative numbers not allowed <-1,-2,-3,-10,-10,-456,-5,>",
+        ):
+            add("-1,-2,-3,-10*-10)-456-(-5\n")
 
 
 class TestLargeDataset:

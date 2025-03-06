@@ -1,7 +1,7 @@
 from typing import Generator, Union
 from functools import lru_cache
 
-from conf import DEFAULT_DELIMITER
+from conf import DEFAULT_DELIMITER, OUTPUT_FILE
 
 
 class NegativeNumberException(Exception):
@@ -10,6 +10,12 @@ class NegativeNumberException(Exception):
     """
 
     pass
+
+
+def stream_file(inout_file):
+    with open(inout_file, "r") as file:
+        for line in file:
+            yield line
 
 
 def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
@@ -50,7 +56,7 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
 
 
 @lru_cache(maxsize=3)
-def add(numbers: str) -> int:
+def add(numbers: str, raise_exception=True) -> int:
     """
     String calculator to calculate the sum of all the integers in the string
     :param numbers: a string of delimiter-separated numbers
@@ -75,8 +81,10 @@ def add(numbers: str) -> int:
                 continue
             numbers_sum += number
 
-    if negatives_exists:
-        pass
+    if negatives_exists and raise_exception:
+        raise NegativeNumberException(
+            f"Negative numbers not allowed <{''.join(stream_file(OUTPUT_FILE))}>"
+        )
 
     return numbers_sum
 
