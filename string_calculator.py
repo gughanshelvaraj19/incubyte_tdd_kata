@@ -19,7 +19,8 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
     :return Generator: an integer number iterable or None
     """
     char_accumulator = ""
-    for char in number_string:
+    idx = None
+    for idx, char in enumerate(number_string):
         char = char.strip()
 
         # filters numeric characters
@@ -28,15 +29,23 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
         # filters non-numeric character and yields accumulated numeric chars
         elif char.isascii() and char_accumulator.isnumeric():
             numeric_value: int = int(char_accumulator)
+
+            # skips yielding values greater than 1000
             if numeric_value > 1000:
                 char_accumulator = ""
                 continue
-            yield numeric_value
+
+            # validates for negative number and yield negative value if exists
+            has_minus = number_string[abs(idx - len(char_accumulator) - 1)] == "-"
+            yield numeric_value if not has_minus else -numeric_value
             char_accumulator = ""
     else:
         # yields last accumulated numeric value
         if char_accumulator.isnumeric():
-            yield int(char_accumulator)
+            leftover_value: int = int(char_accumulator)
+            if idx:
+                has_minus = number_string[idx - len(char_accumulator)] == "-"
+                yield leftover_value if not has_minus else -leftover_value
     return ()
 
 
@@ -49,6 +58,7 @@ def add(numbers: str) -> int:
     :raises NegativeNumberException: raises an exception
     """
     numbers_sum = 0
+    negatives_exists = False
 
     # validates input string
     if not isinstance(numbers, str):
@@ -57,9 +67,17 @@ def add(numbers: str) -> int:
         return numbers_sum
 
     # using accumulator pattern for summation of numbers
-    for number in ondemand_char_gettr(numbers):
-        # filters number greater than 1000
-        numbers_sum += number
+    with open("negatives.txt", "w") as fp:
+        for number in ondemand_char_gettr(numbers):
+            if number < 0:
+                negatives_exists = True
+                fp.write(str(number) + ",")
+                continue
+            numbers_sum += number
+
+    if negatives_exists:
+        pass
+
     return numbers_sum
 
 
