@@ -1,4 +1,4 @@
-from typing import Generator, Union
+from typing import Generator
 from functools import lru_cache
 
 from conf import DEFAULT_DELIMITER, OUTPUT_FILE
@@ -18,7 +18,7 @@ def stream_file(inout_file):
             yield line
 
 
-def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
+def ondemand_char_gettr(number_string: str) -> Generator[int, None, None]:
     """
     On demand text getter
     :param number_string: a string of delimiter-separated numbers
@@ -42,7 +42,10 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
                 continue
 
             # validates for negative number and yield negative value if exists
-            has_minus = number_string[abs(idx - len(char_accumulator) - 1)] == "-"
+            has_minus = (
+                idx - len(char_accumulator) > 0
+                and number_string[idx - len(char_accumulator) - 1] == "-"
+            )
             yield numeric_value if not has_minus else -numeric_value
             char_accumulator = ""
     else:
@@ -50,9 +53,12 @@ def ondemand_char_gettr(number_string: str) -> Union[Generator, tuple]:
         if char_accumulator.isnumeric():
             leftover_value: int = int(char_accumulator)
             if idx:
-                has_minus = number_string[idx - len(char_accumulator)] == "-"
+                has_minus = (
+                    len(number_string) - len(char_accumulator) > 0
+                    and number_string[len(number_string) - len(char_accumulator) - 1]
+                    == "-"
+                )
                 yield leftover_value if not has_minus else -leftover_value
-    return ()
 
 
 @lru_cache(maxsize=3)
@@ -74,7 +80,7 @@ def add(numbers: str, raise_exception: bool = True) -> int:
         return numbers_sum
 
     # using accumulator pattern for summation of numbers
-    with open("negatives.txt", "w") as fp:
+    with open(OUTPUT_FILE, "w") as fp:
         for number in ondemand_char_gettr(numbers):
             if number < 0:
                 negatives_exists = True
