@@ -71,7 +71,7 @@ def add(numbers: str, raise_exception: bool = True) -> int:
     :raises NegativeNumberException: raises an exception
     """
     numbers_sum = 0
-    negatives_exists = False
+    negatives = []
 
     # validates input string
     if not isinstance(numbers, str):
@@ -79,19 +79,25 @@ def add(numbers: str, raise_exception: bool = True) -> int:
     elif not numbers.strip() or not numbers.strip(DEFAULT_DELIMITER):
         return numbers_sum
 
-    # using accumulator pattern for summation of numbers
-    with open(OUTPUT_FILE, "w") as fp:
-        for number in ondemand_char_gettr(numbers):
-            if number < 0:
-                negatives_exists = True
-                fp.write(str(number) + ",")
-                continue
+    for number in ondemand_char_gettr(numbers):
+        if number < 0:
+            negatives.append(number)
+        else:
             numbers_sum += number
 
-    if negatives_exists and raise_exception:
-        raise NegativeNumberException(
-            f"Negative numbers not allowed <{''.join(stream_file(OUTPUT_FILE))}>"
-        )
+    # Write negatives to file in chunks if found
+    if negatives:
+        with open(OUTPUT_FILE, "w") as fp:
+            for i in range(0, len(negatives), 100):  # Write in chunks of 100
+                fp.write(",".join(map(str, negatives[i : i + 100])) + "\n")
+
+        if raise_exception:
+            preview_negatives = ",".join(
+                map(str, negatives[:10])
+            )  # Limit exception message
+            raise NegativeNumberException(
+                f"Negative numbers not allowed <{preview_negatives}, ...>"
+            )
 
     return numbers_sum
 

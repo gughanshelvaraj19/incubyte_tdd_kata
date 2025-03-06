@@ -97,7 +97,7 @@ class TestAdd:
 
         with pytest.raises(
             NegativeNumberException,
-            match="Negative numbers not allowed <-1,-2,-3,-10,-10,-456,-5,>",
+            match="Negative numbers not allowed <-1,-2,-3,-10,-10,-456,-5, ...>",
         ):
             add("-1,-2,-3,-10*-10)-456-(-5\n")
 
