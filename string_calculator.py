@@ -1,15 +1,25 @@
-skip_char = "\n"
+from conf import DEFAULT_DELIMITER, DEFAULT_BUFFER_SIZE
 
 
 class NegativeNumberException(Exception):
     pass
 
 
-def add(numbers: str, default_delimiter=",") -> int:
+def ondemand_char_gettr(numbers, buffer_size=DEFAULT_BUFFER_SIZE):
+    """
+    On demand text getter
+    :param buffer_size: an ineger buffer size, defaults to DEFAULT_BUFFER_SIZE
+    :param numbers: a string of delimiter-separated numbers
+    """
+    for number in numbers:
+        if number.isnumeric():
+            yield int(number)
+
+
+def add(numbers: str) -> int:
     """
     String calculator to calculate the sum of all the integers in the string
     :param numbers: a string of delimiter-separated numbers
-    :param default_delimiter: specifies the default delimiter
     :return: an integer, sum of the numbers
     :raises NegativeNumberException: raises an exception
     """
@@ -17,23 +27,13 @@ def add(numbers: str, default_delimiter=",") -> int:
 
     if not isinstance(numbers, str):
         return numbers_sum
-    elif not numbers.strip():
+    elif not numbers.strip() or not numbers.strip(DEFAULT_DELIMITER):
         return numbers_sum
 
-    # using accumulator pattern to compute sum
-    for char in numbers.split(default_delimiter):
-        number = int(char)
+    for number in ondemand_char_gettr(numbers):
         numbers_sum += number
-
     return numbers_sum
 
 
-# test cases
-assert add("") == 0
-assert add(" ") == 0
-
-assert add(1) == 0
-assert add((1,)) == 0
-assert add([1, 2]) == 0
-
-assert add("1,2,3") == 6
+if __name__ == "__main__":
+    print("Hey! Have a great day")
