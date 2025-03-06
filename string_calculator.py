@@ -5,15 +5,22 @@ class NegativeNumberException(Exception):
     pass
 
 
-def ondemand_char_gettr(numbers, buffer_size=DEFAULT_BUFFER_SIZE):
+def ondemand_char_gettr(number_string: str):
     """
     On demand text getter
-    :param buffer_size: an ineger buffer size, defaults to DEFAULT_BUFFER_SIZE
-    :param numbers: a string of delimiter-separated numbers
+    :param number_string: a string of delimiter-separated numbers
     """
-    for number in numbers:
-        if number.isnumeric():
-            yield int(number)
+    char_accumulator = ""
+    for char in number_string:
+        char = char.strip()
+        if char.isnumeric():
+            char_accumulator += char
+        elif char.isascii() and char_accumulator.isnumeric():
+            yield int(char_accumulator)
+            char_accumulator = ""
+    else:
+        if char_accumulator.isnumeric():
+            yield int(char_accumulator)
 
 
 def add(numbers: str) -> int:
